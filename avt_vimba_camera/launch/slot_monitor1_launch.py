@@ -42,7 +42,7 @@ def generate_launch_description():
         parameters = [
             LaunchConfiguration('avt_vimba_camera_params_file'),
             {"name": "camera"},
-            {"ip": "169.254.100.66"},
+            {"ip": "192.168.2.89"},
             {"guid": ""},
             {"camera_info_url": avt_vimba_camera_calibration_file},
             {"frame_id": "camera"},
@@ -52,8 +52,8 @@ def generate_launch_description():
             {"local_inference_fps": 5.},
             {"timestamp_margin_milisecond_": 0.05},
             {"convert_frame": 50},
-            {"dnn_cfg_path": "/home/avees/ros2_ws/weights/yolov4.cfg"},
-            {"dnn_weight_path": "/home/avees/ros2_ws/weights/yolov4.weights"},
+            {"dnn_cfg_path": "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4-tiny.cfg"},
+            {"dnn_weight_path": "/home/avees/weights/yolov4-tiny.weights"},
             {"can_send_time_interval_microsecond": 1000},
         ]
     )

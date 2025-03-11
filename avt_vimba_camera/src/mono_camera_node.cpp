@@ -106,7 +106,7 @@ void MonoCameraNode::LoadParams()
   node_index_ = this->declare_parameter("node_index", 0);
 
   // Image Selection
-  number_of_nodes_ = this->declare_parameter("number_of_nodes", 1);
+  number_of_nodes_ = this->declare_parameter("number_of_nodes", 2);
   local_inference_fps_ = this->declare_parameter("local_inference_fps", 5.0);
   timestamp_margin_milisecond_ = this->declare_parameter("timestamp_margin_milisecond", 0.05);
 
@@ -114,8 +114,8 @@ void MonoCameraNode::LoadParams()
   convert_frame_ = this->declare_parameter("convert_frame", 1);
 
   // Object Detection
-  dnn_cfg_path_ = this->declare_parameter("dnn_cfg_path", "/home/avees/ros2_ws/weights/yolov4-p6.cfg");
-  dnn_weight_path_ = this->declare_parameter("dnn_weight_path", "/home/avees/ros2_ws/weights/yolov4-p6.weights");
+  dnn_cfg_path_ = this->declare_parameter("dnn_cfg_path", "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4-tiny.cfg");
+  dnn_weight_path_ = this->declare_parameter("dnn_weight_path", "/home/avees/weights/yolov4-tiny.weights");
 
   RCLCPP_INFO(this->get_logger(), "[Initialize] Parameters loaded");
 }
@@ -210,8 +210,11 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
 
       detections_ros2_msg.detections.push_back(detection_ros2_msg);
     }
+    std::cerr << "prepublish" << std::endl;
     this->detections_publisher_->publish(detections_ros2_msg);
+    std::cerr << "after publish" << std::endl;  
   }
+  
   else
   {
     RCLCPP_WARN_STREAM(this->get_logger(), "Function frameToImage returned 0. No image published.");

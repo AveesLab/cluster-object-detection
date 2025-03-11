@@ -43,7 +43,7 @@ def generate_launch_description():
             LaunchConfiguration('avt_vimba_camera_params_file'),
             {"name": "camera"},
             {"frame_id": "camera"},
-            {"ip": "169.254.100.66"},
+            {"ip": "192.168.2.89"},
             {"guid": ""},
             {"use_measurement_time": True},
             {"ptp_offset": 0},

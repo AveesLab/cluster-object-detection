@@ -3,7 +3,7 @@
   <!-- Driver parameters, these parameters affect the way the ROS driver works -->
   <arg name="name" default="camera"/>
   <arg name="frame_id" default="$(var name)"/>
-  <arg name="ip" default="169.254.100.66"/>
+  <arg name="ip" default="192.168.2.89"/>
   <arg name="guid" default=""/>
   <arg name="use_measurement_time" default="true"/>
   <arg name="ptp_offset" default="0"/>
