@@ -106,7 +106,7 @@ void MonoCameraNode::LoadParams()
   node_index_ = this->declare_parameter("node_index", 0);
 
   // Image Selection
-  number_of_nodes_ = this->declare_parameter("number_of_nodes", 2);
+  number_of_nodes_ = this->declare_parameter("number_of_nodes", 3);
   local_inference_fps_ = this->declare_parameter("local_inference_fps", 5.0);
   timestamp_margin_milisecond_ = this->declare_parameter("timestamp_margin_milisecond", 0.05);
 
@@ -210,9 +210,7 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
 
       detections_ros2_msg.detections.push_back(detection_ros2_msg);
     }
-    std::cerr << "prepublish" << std::endl;
     this->detections_publisher_->publish(detections_ros2_msg);
-    std::cerr << "after publish" << std::endl;  
   }
   
   else

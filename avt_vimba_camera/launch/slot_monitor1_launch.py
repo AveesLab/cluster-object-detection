@@ -48,7 +48,7 @@ def generate_launch_description():
             {"frame_id": "camera"},
             {"ptp_offset": 0},
             {"node_index": index},
-            {"number_of_nodes": 4},
+            {"number_of_nodes": 3},
             {"local_inference_fps": 5.},
             {"timestamp_margin_milisecond_": 0.05},
             {"convert_frame": 50},
