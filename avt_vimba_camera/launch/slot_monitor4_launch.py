@@ -52,8 +52,8 @@ def generate_launch_description():
             {"local_inference_fps": 7.5},
             {"timestamp_margin_milisecond_": 0.05},
             {"convert_frame": 50},
-            {"dnn_cfg_path": "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4-tiny.cfg"},
-            {"dnn_weight_path": "/home/avees/weights/yolov4-tiny.weights"},
+            {"dnn_cfg_path": "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4.cfg"},
+            {"dnn_weight_path": "/home/avees/weights/yolov4.weights"},
             {"can_send_time_interval_microsecond": 1000},
         ]
     )

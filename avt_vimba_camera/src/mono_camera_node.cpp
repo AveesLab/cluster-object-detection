@@ -139,8 +139,8 @@ void MonoCameraNode::LoadParams()
   convert_frame_ = this->declare_parameter("convert_frame", 5);
 
   // Object Detection
-  dnn_cfg_path_ = this->declare_parameter("dnn_cfg_path", "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4-tiny.cfg");
-  dnn_weight_path_ = this->declare_parameter("dnn_weight_path", "/home/avees/weights/yolov4-tiny.weights");
+  dnn_cfg_path_ = this->declare_parameter("dnn_cfg_path", "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4.cfg");
+  dnn_weight_path_ = this->declare_parameter("dnn_weight_path", "/home/avees/weights/yolov4.weights");
 
   RCLCPP_INFO(this->get_logger(), "[Initialize] Parameters loaded");
 }
