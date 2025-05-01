@@ -33,6 +33,11 @@
 #include <avt_vimba_camera/mono_camera_node.hpp>
 #include <avt_vimba_camera_msgs/srv/load_settings.hpp>
 #include <avt_vimba_camera_msgs/srv/save_settings.hpp>
+#include <iostream>
+#include <unistd.h>
+#include <stdint.h>
+using namespace std;
+using namespace std::placeholders;
 
 // OpenCV
 #include <opencv2/imgproc/imgproc.hpp>
@@ -41,7 +46,27 @@
 #include <cv_bridge/cv_bridge.h>
 
 
-using namespace std::placeholders;
+vector<uint64_t> e_preprocess;
+vector<uint64_t> start_preprocess;	
+vector<uint64_t> end_preprocess;
+vector<uint64_t> e_inference;
+vector<uint64_t> start_inference;
+vector<uint64_t> end_inference;
+vector<uint64_t> e_postprocess;
+vector<uint64_t> start_postprocess;
+vector<uint64_t> end_postprocess;
+vector<uint64_t> start_ethernet;
+vector<uint64_t> start_preethernet;
+vector<uint64_t> end_preethernet;
+vector<uint64_t> e_preethernet;
+vector<uint64_t> start_while;
+vector<uint64_t> end_while;
+vector<uint64_t> e_while;
+vector<uint64_t> end_while_max;
+vector<uint64_t> e_while_max;
+int img_num=0;
+
+std::ostringstream file_name;
 
 namespace avt_vimba_camera
 {
@@ -111,13 +136,20 @@ void MonoCameraNode::LoadParams()
   timestamp_margin_milisecond_ = this->declare_parameter("timestamp_margin_milisecond", 0.05);
 
   // Image Selection : Synchronize
-  convert_frame_ = this->declare_parameter("convert_frame", 1);
+  convert_frame_ = this->declare_parameter("convert_frame", 5);
 
   // Object Detection
   dnn_cfg_path_ = this->declare_parameter("dnn_cfg_path", "/home/avees/object_detection/src/cluster-object-detection/avt_vimba_camera/include/objectdetection/darknet/cfg/yolov4-tiny.cfg");
   dnn_weight_path_ = this->declare_parameter("dnn_weight_path", "/home/avees/weights/yolov4-tiny.weights");
 
   RCLCPP_INFO(this->get_logger(), "[Initialize] Parameters loaded");
+}
+
+uint64_t MonoCameraNode::get_time_in_ms() 
+{
+  rclcpp::Time now = this->get_clock()->now();
+  uint64_t nanosecond = now.nanoseconds(); 
+  return nanosecond/1000;
 }
 
 void MonoCameraNode::Start()
@@ -135,6 +167,7 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
   RCLCPP_INFO(this->get_logger(), "=== AVEES - Cluster-based Object Detection System with Scalable Performance for Autonomous Driving ===");
 
   rclcpp::Time node_start_time = this->get_clock()->now();
+  //RCLCPP_INFO(get_logger(),"FrameCallback called at %.3f sec", this->get_clock()->now().seconds());
 
   sensor_msgs::msg::Image img;
   if (api_.frameToImage(vimba_frame_ptr, img))
@@ -186,19 +219,26 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
     cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(img, img.encoding);
     cv::Mat color_image;
     cv::cvtColor(cv_ptr->image, color_image, cv::COLOR_BayerRG2RGB);
-
-    // Object Detection - Preprocess
+    
+	// Object Detection - Preprocess
+    start_preprocess.push_back(get_time_in_ms());
     this->inference_->Preprocess(color_image);
-
+	end_preprocess.push_back(get_time_in_ms());
+    
     // Object Detection - DNN Inference
+    start_inference.push_back(get_time_in_ms());
     this->inference_->Inference();
-
+    end_inference.push_back(get_time_in_ms());
+    
     // Object Detection - Postprocess
+    start_postprocess.push_back(get_time_in_ms());
     std::vector<ObjectDetection> detections = this->inference_->Postprocess();
-
+    end_postprocess.push_back(get_time_in_ms());
+    
     // Ethernet Publisher
     vision_msgs::msg::Detection2DArray detections_ros2_msg;
     detections_ros2_msg.header = img.header;
+    
     for (size_t i = 0; i < detections.size(); i++)
     {
       vision_msgs::msg::Detection2D detection_ros2_msg;
@@ -210,8 +250,48 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
 
       detections_ros2_msg.detections.push_back(detection_ros2_msg);
     }
+    start_ethernet.push_back(get_time_in_ms());
     this->detections_publisher_->publish(detections_ros2_msg);
+    
+    //csv file
+	if(this->cluster_flag_ == true) 
+	{
+		img_num++;
+	}
+		    
+	if(img_num ==EXP_NUM) 
+	{
+		for(int i=0 ; i<EXP_NUM; i++)
+		{
+			e_inference.push_back(end_inference[i]-start_inference[i]);
+			e_preprocess.push_back(end_preprocess[i]-start_preprocess[i]);
+			e_postprocess.push_back(end_postprocess[i]-start_postprocess[i]);
+			//e_preethernet.push_back(end_preethernet[i]-start_preethernet[i]);
+			//e_while.push_back(end_while[i]-start_while[i]);
+			//e_while_max.push_back(end_while_max[i]-start_while[i]);
+		}
+		file_name << "computing_node"<<this->node_index_<<".csv";
+		std::ofstream file(file_name.str());
+
+		//file << std::fixed << std::setprecision(6) << "preprocess_start_time," << "preprocess_time(us)," << "preprocess_end_time,"<< "inference_start_time," << "inference_time(us)," << "inference_end_time,"<< "postprocess_start_time," << "postprocess_time(us)," << "postprocess_end_time,"<< "preethernet_start_time," << "preethernet_time(us)," << "preethernet_end_time\t"<< "ethernet_start_time," << "start_while," << "e_while," << "end_while," << "e_while_max," << "end_while_max\n" ;
+		
+		file << std::fixed << std::setprecision(6) << "preprocess_start_time," << "preprocess_time(us)," << "preprocess_end_time,"<< "inference_start_time," << "inference_time(us)," << "inference_end_time,"<< "postprocess_start_time," << "postprocess_time(us)," << "postprocess_end_time,"<< "ethernet_start_time\n" ;
+			   
+		for (int i=0;i<EXP_NUM;i++)
+		{
+			//file << start_preprocess[i] <<","<< e_preprocess[i] << ","<< end_preprocess[i] << "," << start_inference[i] <<","<< e_inference[i] << ","<< end_inference[i] << ","<< start_postprocess[i] <<","<< e_postprocess[i] << ","<< end_postprocess[i] << ","<< start_preethernet[i] <<","<< e_preethernet[i] << ","<< end_preethernet[i] << ","<< start_ethernet[i] << "," << start_while[i] << ","<< e_while[i] <<","<< end_while[i] << ","<< e_while_max[i] << ","<< end_while_max[i] << "\n";
+			file << start_preprocess[i] <<","<< e_preprocess[i] << ","<< end_preprocess[i] << "," << start_inference[i] <<","<< e_inference[i] << ","<< end_inference[i] << ","<< start_postprocess[i] <<","<< e_postprocess[i] << ","<< end_postprocess[i] << ","<< start_ethernet[i] << "," << "\n";
+		}
+			
+		file.close();
+			
+		std::cerr << "write result at " << "./computing_node"<<this->node_index_<<".csv" << std::endl ;
+
+		exit(0);
+		    	
+	}
   }
+  
   
   else
   {

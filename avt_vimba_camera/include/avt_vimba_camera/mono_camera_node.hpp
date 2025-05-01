@@ -40,6 +40,8 @@
 #include <string>
 #include <thread>
 #include <cmath>
+#include <stdint.h>
+
 
 // ROS
 #include <avt_vimba_camera_msgs/srv/detail/load_settings__struct.hpp>
@@ -63,6 +65,8 @@
 // DNN Inference
 #include "objectdetection/objectdetection.hpp"
 
+#define TOTAL_NUM_OF_NODES 4
+#define EXP_NUM 100
 
 namespace avt_vimba_camera
 {
@@ -73,6 +77,7 @@ public:
   ~MonoCameraNode();
 
   void Start();
+  uint64_t get_time_in_ms();
 
 private:
   void LoadParams();
