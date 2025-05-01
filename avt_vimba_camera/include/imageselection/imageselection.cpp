@@ -25,9 +25,7 @@ void ImageSelection::RegisterBaseTimestamp(double init_timestamp)
 {
   this->estimated_timestamp_ = init_timestamp * 1000.0 + (this->node_index_ - 1) * this->inverse_of_fps_;
   this->is_compute_node = true;
-  //RCLCPP_INFO(rclcpp::get_logger("ImageSelection"),
-    "RegisterBase: init_ts=%.3f s, est_ts=%.3f ms, idx=%d, inv_fps=%.3f ms",
-    init_timestamp, this->estimated_timestamp_, node_index_, inverse_of_fps_);
+  //RCLCPP_INFO(rclcpp::get_logger("ImageSelection"),"RegisterBase: init_ts=%.3f s, est_ts=%.3f ms, idx=%d, inv_fps=%.3f ms",init_timestamp, this->estimated_timestamp_, node_index_, inverse_of_fps_);
 }
 
 bool ImageSelection::IsSelfOrder(double timestamp)
