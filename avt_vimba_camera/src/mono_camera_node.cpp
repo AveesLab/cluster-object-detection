@@ -167,7 +167,7 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
   RCLCPP_INFO(this->get_logger(), "=== AVEES - Cluster-based Object Detection System with Scalable Performance for Autonomous Driving ===");
 
   rclcpp::Time node_start_time = this->get_clock()->now();
-  //RCLCPP_INFO(get_logger(),"FrameCallback called at %.3f sec", this->get_clock()->now().seconds());
+  RCLCPP_INFO(get_logger(),"FrameCallback called at %.3f sec", this->get_clock()->now().seconds());
 
   sensor_msgs::msg::Image img;
   if (api_.frameToImage(vimba_frame_ptr, img))
@@ -220,10 +220,10 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
     cv::Mat color_image;
     cv::cvtColor(cv_ptr->image, color_image, cv::COLOR_BayerRG2RGB);
     
-	// Object Detection - Preprocess
+    // Object Detection - Preprocess
     start_preprocess.push_back(get_time_in_ms());
     this->inference_->Preprocess(color_image);
-	end_preprocess.push_back(get_time_in_ms());
+    end_preprocess.push_back(get_time_in_ms());
     
     // Object Detection - DNN Inference
     start_inference.push_back(get_time_in_ms());
