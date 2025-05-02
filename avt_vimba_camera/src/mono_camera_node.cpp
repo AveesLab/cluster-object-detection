@@ -238,6 +238,7 @@ void MonoCameraNode::FrameCallback(const FramePtr& vimba_frame_ptr)
     // Ethernet Publisher
     vision_msgs::msg::Detection2DArray detections_ros2_msg;
     detections_ros2_msg.header = img.header;
+    detections_ros2_msg.header.frame_id = std::to_string(this->node_index_);
     
     for (size_t i = 0; i < detections.size(); i++)
     {
