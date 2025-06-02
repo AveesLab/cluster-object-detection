@@ -7,7 +7,7 @@ ImageSelection::ImageSelection(int node_index, int number_of_nodes, double local
   this->estimated_timestamp_ = -1;
   this->is_compute_node = false;
   double cluster_fps_ = local_fps_ * number_of_nodes_;
-  this->inverse_of_fps_ = 1000. / cluster_fps_;
+  this->inverse_of_fps_ = 1000. / cluster_fps_ *2;
   this->max_estimated_timestamp = -1;
   this->min_estimated_timestamp = -1;
 }
